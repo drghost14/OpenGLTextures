@@ -1,123 +1,134 @@
-# ──────────────────────────────────────────────────────────────────────────────
-# CMakeLists.txt for “OpenGL 3D Learning with GLM (Static ENet & Raylib)”
-# Version 1.0
-# Author  : Muhammad Hassnain Khichi (aka drghost)
-# Converted from Makefile v1.5 to CMake
-# ──────────────────────────────────────────────────────────────────────────────
+# =============================================================================
+# Project      : main (OpenGL 3D Learning)
+# Version      : 1.6
+# Author       : Muhammad Hassnain Khichi (aka drghost)
+# Description  : Statically links ENet (libenet.a) and Raylib (libraylib.a)
+#               Configures build types, compiler flags, and packaging targets
+# =============================================================================
 
-cmake_minimum_required(VERSION 3.20)
-project(main
-    VERSION 1.0
-    LANGUAGES CXX
-)
+cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
+project(main VERSION 1.5 LANGUAGES CXX)
 
-#────────────────────────────────────────
-# 1. Compiler / Language Settings
-#────────────────────────────────────────
-set(CMAKE_CXX_STANDARD       23)
+#───────────────────────────────────────────────────────────────────────────────
+# 1. Global Configuration
+#───────────────────────────────────────────────────────────────────────────────
+
+# Enforce C++23
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS     OFF)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
-if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose Debug or Release" FORCE)
+# Default to Release if no build type was specified
+if (NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release CACHE STRING
+      "Choose the type of build (Debug or Release)" FORCE)
 endif()
 
-# Place the final executable in the project root
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
+# Send binaries into <build-dir>/bin
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-#────────────────────────────────────────
-# 2. Include & Library Paths
-#────────────────────────────────────────
-# assume structure:
-# ├─ CMakeLists.txt
-# ├─ include/
-# ├─ lib/
-# └─ src/
-# Use target scopes rather than global include_directories / link_directories
+#───────────────────────────────────────────────────────────────────────────────
+# 2. Sources
+#───────────────────────────────────────────────────────────────────────────────
 
-#────────────────────────────────────────
-# 3. Gather Sources
-#────────────────────────────────────────
-file(GLOB_RECURSE SRCS
-    "${CMAKE_SOURCE_DIR}/src/*.cpp"
+# Collect all .cpp files under src/
+file(GLOB_RECURSE APP_SOURCES
+     "${CMAKE_SOURCE_DIR}/src/*.cpp")
+
+#───────────────────────────────────────────────────────────────────────────────
+# 3. Executable Target
+#───────────────────────────────────────────────────────────────────────────────
+
+add_executable(${PROJECT_NAME}
+    ${APP_SOURCES}
 )
 
-#────────────────────────────────────────
-# 4. Define Executable
-#────────────────────────────────────────
-add_executable(${PROJECT_NAME} ${SRCS})
-
-# scoped include & link dirs
+# Expose your include folder privately
 target_include_directories(${PROJECT_NAME}
     PRIVATE
-        ${CMAKE_SOURCE_DIR}/include
-)
-target_link_directories(${PROJECT_NAME}
-    PRIVATE
-        ${CMAKE_SOURCE_DIR}/lib
+      ${CMAKE_SOURCE_DIR}/include
 )
 
-#────────────────────────────────────────
-# 5. Compile Options
-#────────────────────────────────────────
+#───────────────────────────────────────────────────────────────────────────────
+# 4. Compiler & Linker Flags
+#───────────────────────────────────────────────────────────────────────────────
+
+# Common compile warnings
 target_compile_options(${PROJECT_NAME} PRIVATE
     -m64
+    -Wall
+    -Wextra
+    -Wpedantic
     $<$<CONFIG:Debug>:-g -O0 -DDEBUG>
     $<$<CONFIG:Release>:-O2 -DNDEBUG>
-    -Wall
 )
 
-#────────────────────────────────────────
-# 6. Linker Options & Libraries
-#────────────────────────────────────────
-if(WIN32)
-  target_link_options(${PROJECT_NAME} PRIVATE
-    -m64
-    -static
-    -static-libstdc++
-    -static-libgcc
-    -Wl,-subsystem,console
-  )
-  target_link_libraries(${PROJECT_NAME} PRIVATE
+#───────────────────────────────────────────────────────────────────────────────
+# 5. Imported Static Libraries
+#───────────────────────────────────────────────────────────────────────────────
+
+# Raylib
+add_library(raylib STATIC IMPORTED GLOBAL)
+set_target_properties(raylib PROPERTIES
+    IMPORTED_LOCATION "${CMAKE_SOURCE_DIR}/lib/libraylib.a"
+)
+
+# ENet
+add_library(enet STATIC IMPORTED GLOBAL)
+set_target_properties(enet PROPERTIES
+    IMPORTED_LOCATION "${CMAKE_SOURCE_DIR}/lib/libenet.a"
+)
+
+#───────────────────────────────────────────────────────────────────────────────
+# 6. Linkage
+#───────────────────────────────────────────────────────────────────────────────
+
+target_link_libraries(${PROJECT_NAME} PRIVATE
     raylib
     enet
-    stdc++exp
     gdi32
     winmm
     opengl32
     ws2_32
-  )
-else()
-  target_link_libraries(${PROJECT_NAME} PRIVATE
-    raylib
-    enet
-    stdc++exp
-  )
-endif()
-
-#────────────────────────────────────────
-# 7. Installation Rules
-#────────────────────────────────────────
-install(TARGETS ${PROJECT_NAME}
-    RUNTIME DESTINATION bin
 )
 
-#────────────────────────────────────────
-# 8. Packaging Support (optional)
-#────────────────────────────────────────
-# include(CPack)
-# set(CPACK_GENERATOR "TGZ;ZIP")
-# set(CPACK_PACKAGE_NAME ${PROJECT_NAME})
-# set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
-# include(CPack)
+#───────────────────────────────────────────────────────────────────────────────
+# 7. Custom Targets: Strip & Package
+#───────────────────────────────────────────────────────────────────────────────
 
-#────────────────────────────────────────
-# 9. Notes to Build & Install
-#────────────────────────────────────────
-# mkdir build && cd build
-# cmake .. -DCMAKE_BUILD_TYPE=Release
-# cmake --build .
-# cmake --install . --prefix /usr/local
+# Strip symbols from the final exe
+add_custom_target(strip_symbols
+    COMMAND ${CMAKE_STRIP} "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${PROJECT_NAME}.exe"
+    COMMENT "∘ Stripping debugging symbols"
+)
+
+# Package into dist/
+add_custom_target(package
+    DEPENDS ${PROJECT_NAME} strip_symbols
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_SOURCE_DIR}/dist"
+    COMMAND ${CMAKE_COMMAND} -E copy
+            "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${PROJECT_NAME}.exe"
+            "${CMAKE_SOURCE_DIR}/dist/"
+    COMMENT "∘ Packaging stripped executable into dist/"
+)
+
+# All-in-one release build + package
+add_custom_target(release_package
+    COMMENT "∘ Full Release → Build, Strip, Package"
+    COMMAND ${CMAKE_COMMAND} --build . --config Release
+    COMMAND ${CMAKE_COMMAND} --build . --target package
+)
+
+#───────────────────────────────────────────────────────────────────────────────
+# 8. Usage Instructions
+#───────────────────────────────────────────────────────────────────────────────
+
+# To build:
+#   mkdir build && cd build
+#   cmake .. -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release
+#   cmake --build . --config Release
 #
-# To switch to Debug:
-# cmake .. -DCMAKE_BUILD_TYPE=Debug
+# To strip & package:
+#   cmake --build . --target release_package
+#
+# Final executable lives in bin/main.exe (and dist/main.exe once packaged)
