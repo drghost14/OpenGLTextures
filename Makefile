@@ -1,6 +1,6 @@
 # ──────────────────────────────────────────────────────────────────────────────
 # Project      : OpenGL 3D Learning with GLM (Static ENet & Raylib)
-# Makefile     : Version 1.5
+# Makefile     : Version 1.6
 # Author       : Muhammad Hassnain Khichi (aka drghost)
 # Description  : Statically links ENet (libenet.a) and Raylib (libraylib.a)
 # ──────────────────────────────────────────────────────────────────────────────
@@ -11,20 +11,29 @@
 CXX       := g++
 CXXFLAGS  := -m64 -O2 -Wall -std=c++23 -Iinclude
 
-# Link everything statically:
-#  -static            -> produce a fully static binary
-#  -static-libstdc++  -> link libstdc++ statically
-#  -static-libgcc     -> link libgcc statically
-# -Bstatic/-Bdynamic  -> force static for ENet & Raylib, dynamic afterwards
+#────────────────────────────────────────
+# Librarian & Static Flags
+#────────────────────────────────────────
+# -static            -> fully static binary
+# -static-libstdc++  -> libstdc++ statically
+# -static-libgcc     -> libgcc statically
+# -Bstatic/-Bdynamic -> switch for .a archives
 LDFLAGS := \
-		-m64 \
-		-static \
-		-static-libstdc++ \
-		-static-libgcc \
-		-Llib \
-		-Wl,-Bstatic -lraylib -lenet -lstdc++exp \
-		-Wl,-Bdynamic -lgdi32 -lwinmm -lopengl32 -lws2_32 \
-		-Wl,-subsystem,console
+	-m64 \
+	-static \
+	-static-libstdc++ \
+	-static-libgcc \
+	-Llib \
+	-Wl,-Bstatic \
+		-l:libenet.a \
+		-l:libraylib.a \
+	-Wl,-Bdynamic \
+		-lgdi32 \
+		-lwinmm \
+		-lopengl32 \
+		-lws2_32 \
+	-Wl,-subsystem,console
+
 
 #────────────────────────────────────────
 # Parallelism
@@ -80,10 +89,10 @@ pr_run: pr
 	@./$(TARGET)
 
 #────────────────────────────────────────
-# Link step
+# Link Rule
 #────────────────────────────────────────
 $(TARGET): $(OBJS)
-	@echo "→ Linking $@…"
+	@echo "→ Linking $@ statically…"
 	@$(CXX) $(CXXFLAGS) -o $@ $(OBJS) $(LDFLAGS)
 
 #────────────────────────────────────────
