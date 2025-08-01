@@ -7,7 +7,7 @@
 # =============================================================================
 
 cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
-project(main VERSION 1.5 LANGUAGES CXX)
+project(main VERSION 1.6 LANGUAGES CXX)
 
 #───────────────────────────────────────────────────────────────────────────────
 # 1. Global Configuration
@@ -24,14 +24,18 @@ if (NOT CMAKE_BUILD_TYPE)
       "Choose the type of build (Debug or Release)" FORCE)
 endif()
 
-# Send binaries into <build-dir>/bin
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+# Place executables in project root (parent of build/)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
+
+# Keep archives and libraries default or set elsewhere if needed
+unset(CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
+unset(CMAKE_LIBRARY_OUTPUT_DIRECTORY)
 
 #───────────────────────────────────────────────────────────────────────────────
 # 2. Sources
 #───────────────────────────────────────────────────────────────────────────────
 
-# Collect all .cpp files under src/
+# Gather all .cpp files under src/
 file(GLOB_RECURSE APP_SOURCES
      "${CMAKE_SOURCE_DIR}/src/*.cpp")
 
@@ -43,7 +47,6 @@ add_executable(${PROJECT_NAME}
     ${APP_SOURCES}
 )
 
-# Expose your include folder privately
 target_include_directories(${PROJECT_NAME}
     PRIVATE
       ${CMAKE_SOURCE_DIR}/include
@@ -53,7 +56,6 @@ target_include_directories(${PROJECT_NAME}
 # 4. Compiler & Linker Flags
 #───────────────────────────────────────────────────────────────────────────────
 
-# Common compile warnings
 target_compile_options(${PROJECT_NAME} PRIVATE
     -m64
     -Wall
@@ -67,13 +69,11 @@ target_compile_options(${PROJECT_NAME} PRIVATE
 # 5. Imported Static Libraries
 #───────────────────────────────────────────────────────────────────────────────
 
-# Raylib
 add_library(raylib STATIC IMPORTED GLOBAL)
 set_target_properties(raylib PROPERTIES
     IMPORTED_LOCATION "${CMAKE_SOURCE_DIR}/lib/libraylib.a"
 )
 
-# ENet
 add_library(enet STATIC IMPORTED GLOBAL)
 set_target_properties(enet PROPERTIES
     IMPORTED_LOCATION "${CMAKE_SOURCE_DIR}/lib/libenet.a"
@@ -131,4 +131,4 @@ add_custom_target(release_package
 # To strip & package:
 #   cmake --build . --target release_package
 #
-# Final executable lives in bin/main.exe (and dist/main.exe once packaged)
+# Final executable lives in ../main.exe (and dist/main.exe once packaged)
