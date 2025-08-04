@@ -1,94 +1,97 @@
-## 🎨 CodeCanvas — A Visual Studio Code Template for C++ Graphics & Networking
+## OpenGLTextures
 
-**CodeCanvas** is a curated C++ starter kit designed specifically for **Visual Studio Code** users on Windows. It wraps together powerful technologies—graphics, networking, and input handling—into a flexible, clean setup that accelerates development for interactive applications, games, and real-time tools.
-
----
-
-### ⚙️ Built On
-
-- 🖼️ **Raylib**            — simplifies graphics, window creation, and input
-- 📐 **GLM**               — modern C++ mathematics library for graphics applications
-- 🌐 **ENet**              — lightweight UDP-based networking
-- 🎮 **OpenGL (via GLAD)** — for modern GPU rendering
-- 🧰 **MinGW**             — compiler and linker (make sure it’s installed)
-- 📄 **Makefile**          — build logic for MinGW
-- 🛠️ **CMake**             — build logic for MinGW / MSVC
-- 🧠 **VS Code Tasks**     — one-click build & clean
+OpenGLTextures is a minimal C++ starter template demonstrating real-time textured quad rendering with Raylib, GLAD, and modern OpenGL. It provides modular classes for shader management, texture loading, VAO setup, and buffer handling—perfect for building interactive demos, ASMR-style visuals, or extending into full-blown graphics engines.
 
 ---
 
-### 📁 Folder Overview
+## ⚙️ Technology Stack
+
+- Raylib — window creation, input handling, and image loading  
+- GLAD — cross-platform OpenGL function loader  
+- OpenGL 3.3+ — modern programmable pipeline  
+- CMake — project generation for MinGW, MSVC, or Unix Makefiles  
+- Makefile — simple GNU Make build logic  
+
+---
+
+## 📁 Project Structure
 
 ```text
-codecanvas/
-├── .vscode/          # VS Code tasks for build/clean
-├── include/
-│   ├── enet/         # ENet networking headers
-│   ├── raylib/       # Raylib headers
-│   ├── glad/         # OpenGL loader headers
-│   ├── KHR/          # Khronos headers (e.g., khrplatform.h)
-│   └── glm/          # Math library for vectors, matrices, transforms
-├── lib/              # DLLs and libraries for linking
-├── src/
-│   └── main.cpp      # Starter source file (currently empty)
-├── Makefile          # Build rules for MinGW         OPTION A
-└── CMakeLists.txt    # Build rules for MinGW / MSVC  OPTION B
+OpenGLTextures/
+├── data/                
+│   └── car.png          # Sample texture image  
+├── shaders/             
+│   ├── vertex.glsl      # Vertex shader source  
+│   └── fragment.glsl    # Fragment shader source  
+├── src/                 
+│   └── main.cpp         # Entry point and demo code  
+├── CMakeLists.txt       # CMake build configuration  
+├── Makefile             # GNU Make build rules  
+├── README.md            # This file  
+└── LICENSE              # MIT license  
 ```
 
-### 🧪 Quick Start Guide
+---
 
-1. **Clone the repository:**
+## 🚀 Quick Start
+
+1. Clone the repository  
    ```bash
-   git clone https://github.com/drghost14/codecanvas.git
+   git clone https://github.com/drghost14/OpenGLTextures.git
+   cd OpenGLTextures
    ```
-2. **Ensure MinGW and make are installed and added to your system PATH.**
-
-3. **Open the folder in Visual Studio Code.**
-
-4. **Build the project:**
-   - Use `Ctrl + Shift + B` to trigger the pre-configured "Build Project" task.
-   - Or run `make` manually from the terminal.
-
-5. **Clean the project:**
-   - Use the "Clean Project" task or run:
+2. Install dependencies  
+   - Raylib development files  
+   - GLAD headers and source  
+   - CMake (or GNU Make)  
+3. Build the project  
+   - With CMake  
      ```bash
-     make clean
+     mkdir build && cd build
+     cmake ..
+     cmake --build .
+     ```  
+   - Or with Make  
+     ```bash
+     make
      ```
+4. Run the demo  
+   ```bash
+   ./OpenGLTextures
+   ```
+   A window will open displaying a textured quad on a light background.
 
 ---
 
-### 🧠 What’s Included in `lib/`
+## 🧩 Core Classes
 
-- `raylib.dll`: Runtime dynamic library for Raylib (used only with dynamic linking)
-- `libraylibdll.a`: Import library for Raylib’s DLL
-- `libraylib.a`: Static library (used in this template)
-
-> 🔧 This template defaults to **static linking** with `libraylib.a`, meaning `raylib.dll` is not required at runtime.
-
----
-
-### 🛠️ Test Code Snippet
-
-```cpp
-#include "raylib/raylib.h"
-#include "glad/glad.h"
-
-int main() {
-    InitWindow(800, 600, "Hello CodeCanvas!");
-    while (!WindowShouldClose()) {
-        BeginDrawing();
-        ClearBackground(RAYWHITE);
-        DrawText("Your template is ready to roll!", 250, 280, 20, GRAY);
-        EndDrawing();
-    }
-    CloseWindow();
-    return 0;
-}
-```
+- **ShaderClass**  
+  Loads, compiles, links, and manages GLSL shaders.  
+- **TextureClass**  
+  Loads images via Raylib, uploads to GPU, sets filtering modes, and generates mipmaps.  
+- **VaoClass**  
+  Creates and manages a vertex array object for attribute binding.  
+- **BufferClass**  
+  Wraps VBO/EBO creation and data buffering with a simple API.  
 
 ---
 
-### 📄 License
+## 🔧 Customization Ideas
 
-CodeCanvas is released under the [MIT License](LICENSE), ensuring it’s free and open for both personal and commercial use. Attribution is appreciated but not required.
+- Swap in different images at runtime for an ASMR-style reveal  
+- Add keyboard controls to toggle between linear and nearest filtering  
+- Extend ShaderClass with uniform setters for floats, vectors, and matrices  
+- Layer multiple quads with blending for soft visual transitions  
 
+---
+
+## 📄 License
+
+### 🔐 License
+
+Rayminder is released under the [MIT License](LICENSE) —  
+you’re free to use, distribute, and remix this application for personal or educational purposes.  
+
+> Attribution is appreciated. Raylib and other dependencies maintain their own license terms.
+
+---
