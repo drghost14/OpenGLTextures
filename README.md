@@ -18,6 +18,7 @@ OpenGLTextures is a minimal C++ starter template demonstrating real-time texture
 
 ```text
 OpenGLTextures/
+├── include/
 ├── data/                
 │   └── car.png          # Sample texture image  
 ├── shaders/             
@@ -57,7 +58,7 @@ OpenGLTextures/
      ```
 4. Run the demo  
    ```bash
-   ./OpenGLTextures
+   ./main.exe
    ```
    A window will open displaying a textured quad on a light background.
 
@@ -95,3 +96,4 @@ you’re free to use, distribute, and remix this application for personal or edu
 > Attribution is appreciated. Raylib and other dependencies maintain their own license terms.
 
 ---
+
