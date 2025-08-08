@@ -18,7 +18,13 @@ OpenGLTextures is a minimal C++ starter template demonstrating real-time texture
 
 ```text
 OpenGLTextures/
+├── .vscode/          # VS Code tasks for build/clean
 ├── include/
+│   ├── enet/         # ENet networking headers
+│   ├── raylib/       # Raylib headers
+│   ├── glad/         # OpenGL loader headers
+│   ├── KHR/          # Khronos headers (e.g., khrplatform.h)
+│   └── glm/          # Math library for vectors, matrices, transforms
 ├── data/                
 │   └── car.png          # Sample texture image  
 ├── shaders/             
@@ -96,4 +102,5 @@ you’re free to use, distribute, and remix this application for personal or edu
 > Attribution is appreciated. Raylib and other dependencies maintain their own license terms.
 
 ---
+
 
